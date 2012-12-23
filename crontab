@@ -1,0 +1,3 @@
+30 2 * * * /usr/sbin/auto_upgrade.sh 
+0 * * * * /usr/sbin/diskspace_monitor.sh
+0 4 * * * /usr/sbin/filesec_monitor.sh 

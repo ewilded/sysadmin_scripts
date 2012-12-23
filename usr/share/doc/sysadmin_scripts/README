@@ -1,0 +1,12 @@
+Here is the whole set of CentOS dedicated administrative automation scripts http://v2.ewil.pl/pub/sysadm_scripts.tar.bz2 (GPLv3 license).
+Package contains:
+global config (for watched disks and e-mail addresses)
+alert_on_reboot.sh - script attached to /etc/rc.local, it simply sends an e-mail to all configured address on each boot, sometimes it's useful
+auto_upgrade.sh - upgrades system with yum and restarts affected services (set it up to cron)
+diskspace_monitor.sh - simple script for e-mail alerting when one of the disks reaches adjusted limit of used space (conenct it up in cron)
+filesec_monitor.sh - script for scanning local system for weak permissions, integraded with rkhunter scan with customizable list of exceptions and reporting via e-mail
+example crontab entries
+
+Currently no installer (RPM package) is made, so you have to distribute files, rc.local and cron entries manually.
+
+Use it at your own risk.
