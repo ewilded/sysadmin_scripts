@@ -1,5 +1,5 @@
 #!/bin/bash
-source /root/scripts/config.sh
+source /etc/sysadmin_scripts/config.sh
 yum -yq upgrade
 if [ "$REBOOT_AFTER_UPGRADE" == "YES" ]; then
 	init 6

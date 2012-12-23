@@ -8,21 +8,22 @@
 MAIL_ALERT=yes
 MAIL_FROM=ewilded@gmail.com
 MAIL_ADDR=(ewilded@gmail.com)
-if [ -f /root/scripts/config.sh ]; then
-	source /root/scripts/config.sh
+if [ -f /etc/sysadmin_scripts/config.sh ]; then
+	source /etc/sysadmin_scripts/config.sh
 	MAIL_ADDR=$EMAIL_ADDR
 	MAIL_FROM=$EMAIL_FROM	
 fi;
 FILESEC_DIRS=(etc lib sbin usr bin dev mnt root var tmp)
 #FILESEC_DIRS=(etc sbin tmp)
 RKHUNTER_PATH=/usr/bin/rkhunter
-SUGID_EXCEPTIONS=/etc/filesec_monitor/perms_monitor_sugid_exceptions
-SUGID_EXCEPTIONS_CUSTOM=/etc/filesec_monitor/perms_monitor_sugid_exceptions_custom
-WORLD_WRITABLE_EXCEPTIONS=/etc/filesec_monitor/perms_monitor_world_writable_exceptions
-WORLD_WRITABLE_EXCEPTIONS_CUSTOM=/etc/filesec_monitor/perms_monitor_world_writable_exceptions_custom
-NON_READABLE=/etc/filesec_monitor/perms_monitor_non_readable
-NON_READABLE_CUSTOM=/etc/filesec_monitor/perms_monitor_non_readable_custom
-RKHUNTER_WARNING_EXCEPTIONS=/etc/filesec_monitor/rkhunter_filesec_exceptions
+SUGID_EXCEPTIONS=/etc/sysadmin_scripts/filesec_monitor/perms_monitor_sugid_exceptions
+SUGID_EXCEPTIONS_CUSTOM=/etc/sysadmin_scripts/filesec_monitor/perms_monitor_sugid_exceptions_custom
+WORLD_WRITABLE_EXCEPTIONS=/etc/sysadmin_scripts/filesec_monitor/perms_monitor_world_writable_exceptions
+WORLD_WRITABLE_EXCEPTIONS_CUSTOM=/etc/sysadmin_scripts/filesec_monitor/perms_monitor_world_writable_exceptions_custom
+NON_READABLE=/etc/sysadmin_scripts/filesec_monitor/perms_monitor_non_readable
+NON_READABLE_CUSTOM=/etc/sysadmin_scripts/filesec_monitor/perms_monitor_non_readable_custom
+RKHUNTER_WARNING_EXCEPTIONS=/etc/sysadmin_scripts/filesec_monitor/rkhunter_filesec_exceptions
+RKHUNTER_WARNING_EXCEPTIONS_CUSTOM=/etc/sysadmin_scripts/filesec_monitor/rkhunter_filesec_exceptions_custom
 ## to avoid issues with PATH while running from cron:
 export PATH='/usr/kerberos/sbin:/usr/kerberos/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin'
 HOSTNAME=`hostname`
@@ -112,15 +113,17 @@ function rkhunter_fsecmon()
 	else
 		while IFS= read -r RKHUNTER_WARNING; do
 			WARNING_OK=NO
-			RKHUNTER_WARNING=`echo $RKHUNTER_WARNING|cut -b 12-`
+			RKHUNTER_WARNING=`echo $RKHUNTER_WARNING|sed 's/^ *//g'`
 			while IFS= read -r RKHUNTER_EXCEPTION; do
-				#echo "Comparing $RKHUNTER_EXCEPTION with $RKHUNTER_WARNING"
 					if [ "$RKHUNTER_EXCEPTION" == "$RKHUNTER_WARNING" ]; then
-					WARNING_OK=YES
-					#echo "$RKHUNTER_EXCEPTION is ok!!!!!!!!!!!!!!!!!!!"
-					break
-				fi;
-			done < <(cat $RKHUNTER_WARNING_EXCEPTIONS)
+						WARNING_OK=YES
+						break
+					fi;
+					if [[ $RKHUNTER_WARNING =~ $RKHUNTER_EXCEPTION ]]; then
+						## added pattern matching to exclude things like /dev/shm/mpich2_temp72e2ed
+						WARNING_OK=YES
+					fi;
+			done < <(cat $RKHUNTER_WARNING_EXCEPTIONS $RKHUNTER_WARNING_EXCEPTIONS_CUSTOM)
 			if [ "$WARNING_OK" == "NO" ]; then
 				 echo "[RKHUNTER] $RKHUNTER_WARNING">>$ERROR_LOG
 			fi;

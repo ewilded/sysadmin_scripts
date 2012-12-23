@@ -1,10 +1,10 @@
 Warning: Checking for prerequisites               [ Warning ]
-         The file of stored file properties (rkhunter.dat) does not exist, and should be created. To do this type in 'rkhunter --propupd'.
+The file of stored file properties (rkhunter.dat) does not exist, and should be created. To do this type in 'rkhunter --propupd'.
 Warning: WARNING! It is the users responsibility to ensure that when the '--propupd' option
-         is used, all the files on their system are known to be genuine, and installed from a
-         reliable source. The rkhunter '--check' option will compare the current file properties
-         against previously stored values, and report if any values differ. However, rkhunter
-         cannot determine what has caused the change, that is for the user to do.
+is used, all the files on their system are known to be genuine, and installed from a
+reliable source. The rkhunter '--check' option will compare the current file properties
+against previously stored values, and report if any values differ. However, rkhunter
+cannot determine what has caused the change, that is for the user to do.
 Warning: The command '/sbin/ifdown' has been replaced by a script: /sbin/ifdown: Bourne-Again shell script text executable
 Warning: The command '/sbin/ifup' has been replaced by a script: /sbin/ifup: Bourne-Again shell script text executable
 Warning: The command '/usr/bin/GET' has been replaced by a script: /usr/bin/GET: perl script text executable
@@ -12,7 +12,7 @@ Warning: The command '/usr/bin/groups' has been replaced by a script: /usr/bin/g
 Warning: The command '/usr/bin/ldd' has been replaced by a script: /usr/bin/ldd: Bourne shell script text executable
 Warning: The command '/usr/bin/whatis' has been replaced by a script: /usr/bin/whatis: Bourne shell script text executable
 Warning: The SSH configuration option 'PermitRootLogin' has not been set.
-         The default value may be 'yes', to allow root access.
+The default value may be 'yes', to allow root access.
 Warning: Hidden directory found: /dev/.udev
 Warning: Hidden file found: /usr/share/man/man1/..1.gz: gzip compressed data, from Unix, max compression
 Warning: Hidden file found: /usr/bin/.fipscheck.hmac: ASCII text
