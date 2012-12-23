@@ -25,8 +25,8 @@ mkdir -p $RPM_BUILD_ROOT/usr/sbin
 mkdir -p $RPM_BUILD_ROOT/usr/share/sysadmin_scripts/{doc,scripts}
 mkdir -p $RPM_BUILD_ROOT/etc/sysadmin_scripts/filesec_monitor
 
-install -m 644 README $RPM_BUILD_ROOT/usr/share/doc/sysadmin_scripts/README
-install -m 644 LICENSE $RPM_BUILD_ROOT/usr/share/doc/sysadmin_scripts/LICENSE
+install -m 644 README $RPM_BUILD_ROOT/usr/share/sysadmin_scripts/doc/README
+install -m 644 LICENSE $RPM_BUILD_ROOT/usr/share/sysadmin_scripts/doc/LICENSE
 install -m 744 alert_on_reboot.sh $RPM_BUILD_ROOT/usr/sbin/alert_on_reboot.sh
 install -m 744 diskspace_monitor.sh $RPM_BUILD_ROOT/usr/sbin/diskspace_monitor.sh
 install -m 744 filesec_monitor.sh $RPM_BUILD_ROOT/usr/sbin/filesec_monitor.sh
