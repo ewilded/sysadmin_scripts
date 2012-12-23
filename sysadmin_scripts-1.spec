@@ -4,7 +4,7 @@ Version: 1
 Release: 0
 License: GPL
 Group: Applications/Security
-Source: sysadmin_scripts.tar.bz2
+Source: sysadmin_scripts-1.tar.bz2
 BuildRoot: /var/tmp/%{name}-buildroot
 
 %description
