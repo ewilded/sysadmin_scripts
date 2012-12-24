@@ -113,7 +113,7 @@ function rkhunter_fsecmon()
 	else
 		while IFS= read -r RKHUNTER_WARNING; do
 			WARNING_OK=NO
-			RKHUNTER_WARNING=`echo $RKHUNTER_WARNING|sed 's/^ *//g'`
+			RKHUNTER_WARNING=`echo $RKHUNTER_WARNING|sed 's/\[[0-9]*:[0-9]*:[0-9]*\]//g'|sed 's/^ *//g'`
 			while IFS= read -r RKHUNTER_EXCEPTION; do
 					if [ "$RKHUNTER_EXCEPTION" == "$RKHUNTER_WARNING" ]; then
 						WARNING_OK=YES

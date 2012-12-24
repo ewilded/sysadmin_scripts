@@ -7,6 +7,4 @@ diskspace_monitor.sh - simple script for e-mail alerting when one of the disks r
 filesec_monitor.sh - script for scanning local system for weak permissions, integraded with rkhunter scan with customizable list of exceptions and reporting via e-mail
 example crontab entries
 
-Currently no installer (RPM package) is made, so you have to distribute files, rc.local and cron entries manually.
-
 Use it at your own risk.
