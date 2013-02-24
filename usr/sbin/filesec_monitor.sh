@@ -39,7 +39,7 @@ function file_checks_fsecmon()
 	 DIR=${FILESEC_DIRS[${i}]}
 	 i=$[$i+1]
 	 echo "Checking directory $DIR..."
-	 
+	 FOUND=0
 	 find /$DIR -type f \( -perm -4000 -o -perm -2000 \)|while IFS= read -r file; do
 	 	 FILE_OK=NO
 		while IFS= read -r exception; do
@@ -55,11 +55,16 @@ function file_checks_fsecmon()
 			fi;
 		 done < <(cat $SUGID_EXCEPTIONS $SUGID_EXCEPTIONS_CUSTOM)
 		 if [ "$FILE_OK" == "NO" ]; then
-		 	 echo "$file has SUID/SGID attribute on.">>$ERROR_LOG
-			 echo "[SUIG/SGID] $file"
+		 	 if [ "$FOUND" == "0" ]; then
+		 	 	echo "[SUID/SGID] The following files have SUID/SGID attributes on:">>$ERROR_LOG
+		 	 	FOUND=1
+		 	 fi;
+		 	 echo "$file">>$ERROR_LOG
+			 echo "$file"
 		 fi;
 	 done;
 	## WORLD WRITABLE
+	FOUND=0
 	 while IFS= read -r file; do
 	 	  FILE_OK=NO	
 		 # echo "Checking $file..."
@@ -77,12 +82,16 @@ function file_checks_fsecmon()
 		 	done < <(cat $WORLD_WRITABLE_EXCEPTIONS $WORLD_WRITABLE_EXCEPTIONS_CUSTOM)
 		   if [ "$FILE_OK" == "NO" ]; then
 					#echo "$file not ok! ERROR_LOG: $ERROR_LOG (FILE_OK=$FILE_OK)"
-					echo "[WRITABLE] $file"
+					if [ "$FOUND" == "0" ]; then
+						echo "[WRITABLE] Following files are world writable (owner path):">>$ERROR_LOG
+						FOUND=1
+					fi;
+					echo "$file"
 					owner=`ls -l $file | awk '//{print $3}'|head -n 1`
 			 		if [ -d $file ]; then
 						owner=`ls -al $file | awk '//{print $3}'|head -n 2|tail -n +2`
 		 			fi;
-		 	   		echo "$file (owned by $owner) is world writable.">>$ERROR_LOG
+		 	   		echo "$owner $file">>$ERROR_LOG
 		 	fi;
 	 done < <(find /$DIR -perm -2 ! -type l)
 	 
@@ -91,9 +100,14 @@ function file_checks_fsecmon()
 	## if the path is a directory - all files under it also are required to be nonreadable
 	while IFS= read -r file; do ## /dev/kmem, /etc/shadow, /etc/shadow- for instance
 		if [[ -f "$file" || -d "$file" ]]; then
+			FOUND=0
 			find "$file" -perm -o=r ! \( -type d -perm -o=t \) ! -type l|while IFS= read -r result; do
-					echo "$result is world readable.">>$ERROR_LOG
-					echo "[READABLE] $result"
+					if [ "$FOUND" == "0" ]; then
+						echo "[READABLE]  Following files are world readable:">>$ERROR_LOG
+						FOUND=1 
+					fi;
+					echo "$result">>$ERROR_LOG
+					echo "$result"
 			done;
 		fi;
 	done < <(cat $NON_READABLE $NON_READABLE_CUSTOM)
@@ -101,34 +115,28 @@ function file_checks_fsecmon()
 function rkhunter_fsecmon()
 {
 	## RKHUNTER CHECKS
-	echo "rkhunter --cronjob --report-warnings-only -q"
+	RKHUNTER_LOG=/var/log/rkhunter.fsecmon.log
+	echo ''>$RKHUNTER_LOG
+	echo "rkhunter --cronjob --report-warnings-only -q -l $RKHUNTER_LOG"
 	$RKHUNTER_PATH --cronjob --report-warnings-only -q
 	echo "Done."
-	RKHUNTER_LOG=/var/log/rkhunter.log
-	if [ ! -f $RKHUNTER_LOG ]; then
-		RKHUNTER_LOG=/var/log/rkhunter/rkhunter.log
-	fi;
-	if [ ! -f $RKHUNTER_LOG ]; then
-		echo "[ERROR] no rkhunter.log was found!">>$ERROR_LOG
-	else
-		while IFS= read -r RKHUNTER_WARNING; do
-			WARNING_OK=NO
-			RKHUNTER_WARNING=`echo $RKHUNTER_WARNING|sed 's/\[[0-9]*:[0-9]*:[0-9]*\]//g'|sed 's/^ *//g'`
-			while IFS= read -r RKHUNTER_EXCEPTION; do
-					if [ "$RKHUNTER_EXCEPTION" == "$RKHUNTER_WARNING" ]; then
-						WARNING_OK=YES
-						break
-					fi;
-					if [[ $RKHUNTER_WARNING =~ $RKHUNTER_EXCEPTION ]]; then
-						## added pattern matching to exclude things like /dev/shm/mpich2_temp72e2ed
-						WARNING_OK=YES
-					fi;
-			done < <(cat $RKHUNTER_WARNING_EXCEPTIONS $RKHUNTER_WARNING_EXCEPTIONS_CUSTOM)
-			if [ "$WARNING_OK" == "NO" ]; then
-				 echo "[RKHUNTER] $RKHUNTER_WARNING">>$ERROR_LOG
-			fi;
-		done < <(egrep 'Warning|possible' $RKHUNTER_LOG)
-	fi;	
+	while IFS= read -r RKHUNTER_WARNING; do
+		WARNING_OK=NO
+		RKHUNTER_WARNING=`echo $RKHUNTER_WARNING|sed 's/\[[0-9]*:[0-9]*:[0-9]*\]//g'|sed 's/^ *//g'`
+		while IFS= read -r RKHUNTER_EXCEPTION; do
+				if [ "$RKHUNTER_EXCEPTION" == "$RKHUNTER_WARNING" ]; then
+					WARNING_OK=YES
+					break
+				fi;
+				if [[ $RKHUNTER_WARNING =~ $RKHUNTER_EXCEPTION ]]; then
+					## added pattern matching to exclude things like /dev/shm/mpich2_temp72e2ed
+					WARNING_OK=YES
+				fi;
+		done < <(cat $RKHUNTER_WARNING_EXCEPTIONS $RKHUNTER_WARNING_EXCEPTIONS_CUSTOM)
+		if [ "$WARNING_OK" == "NO" ]; then
+			 echo "[RKHUNTER] $RKHUNTER_WARNING">>$ERROR_LOG
+		fi;
+	done < <(egrep 'Warning|possible' $RKHUNTER_LOG)	
 }
 
 ### MAIN

@@ -22,3 +22,4 @@
 /var/run/pcscd.comm
 /var/run/setrans/.setrans-unix
 /var/run/cups/cups.sock 
+/var/spool/postfix

@@ -66,3 +66,7 @@
 /usr/sbin/lockdev
 /usr/sbin/userisdnctl
 /usr/kerberos/bin/ksu
+/usr/libexec/pt_chown
+/usr/sbin/postqueue
+/usr/sbin/postdrop
+/bin/cgexec 
